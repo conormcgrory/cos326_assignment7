@@ -1,0 +1,34 @@
+### Starting build.
+# Target: examples.ml.depends, tags: { extension:ml, file:examples.ml, ocaml, ocamldep, package(str), package(threads), quiet, thread, traverse }
+ocamlfind ocamldep -package threads -package str -modules examples.ml > examples.ml.depends # cached
+# Target: future.mli.depends, tags: { extension:mli, file:future.mli, ocaml, ocamldep, package(str), package(threads), quiet, thread, traverse }
+ocamlfind ocamldep -package threads -package str -modules future.mli > future.mli.depends # cached
+# Target: future.cmi, tags: { byte, compile, extension:mli, file:future.mli, interf, ocaml, package(str), package(threads), quiet, thread, traverse }
+ocamlfind ocamlc -c -thread -package threads -package str -o future.cmi future.mli # cached
+# Target: mpi.mli.depends, tags: { extension:mli, file:mpi.mli, ocaml, ocamldep, package(str), package(threads), quiet, thread, traverse }
+ocamlfind ocamldep -package threads -package str -modules mpi.mli > mpi.mli.depends # cached
+# Target: mpi.cmi, tags: { byte, compile, extension:mli, file:mpi.mli, interf, ocaml, package(str), package(threads), quiet, thread, traverse }
+ocamlfind ocamlc -c -thread -package threads -package str -o mpi.cmi mpi.mli # cached
+# Target: examples.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:examples.cmo, file:examples.ml, implem, ocaml, package(str), package(threads), quiet, thread, traverse }
+ocamlfind ocamlc -c -thread -package threads -package str -o examples.cmo examples.ml # cached
+# Target: future.ml.depends, tags: { extension:ml, file:future.ml, ocaml, ocamldep, package(str), package(threads), quiet, thread, traverse }
+ocamlfind ocamldep -package threads -package str -modules future.ml > future.ml.depends # cached
+# Target: future.cmx, tags: { compile, extension:cmx, extension:ml, file:future.cmx, file:future.ml, implem, native, ocaml, package(str), package(threads), quiet, thread, traverse }
+ocamlfind ocamlopt -c -thread -package threads -package str -o future.cmx future.ml # cached
+# Target: mpi.ml.depends, tags: { extension:ml, file:mpi.ml, ocaml, ocamldep, package(str), package(threads), quiet, thread, traverse }
+ocamlfind ocamldep -package threads -package str -modules mpi.ml > mpi.ml.depends # cached
+# Target: system.ml.depends, tags: { extension:ml, file:system.ml, ocaml, ocamldep, package(str), package(threads), quiet, thread, traverse }
+ocamlfind ocamldep -package threads -package str -modules system.ml > system.ml.depends # cached
+# Target: system.mli.depends, tags: { extension:mli, file:system.mli, ocaml, ocamldep, package(str), package(threads), quiet, thread, traverse }
+ocamlfind ocamldep -package threads -package str -modules system.mli > system.mli.depends # cached
+# Target: system.cmi, tags: { byte, compile, extension:mli, file:system.mli, interf, ocaml, package(str), package(threads), quiet, thread, traverse }
+ocamlfind ocamlc -c -thread -package threads -package str -o system.cmi system.mli # cached
+# Target: system.cmx, tags: { compile, extension:cmx, extension:ml, file:system.cmx, file:system.ml, implem, native, ocaml, package(str), package(threads), quiet, thread, traverse }
+ocamlfind ocamlopt -c -thread -package threads -package str -o system.cmx system.ml # cached
+# Target: mpi.cmx, tags: { compile, extension:cmx, extension:ml, file:mpi.cmx, file:mpi.ml, implem, native, ocaml, package(str), package(threads), quiet, thread, traverse }
+ocamlfind ocamlopt -c -thread -package threads -package str -o mpi.cmx mpi.ml # cached
+# Target: examples.cmx, tags: { compile, extension:cmx, extension:ml, file:examples.cmx, file:examples.ml, implem, native, ocaml, package(str), package(threads), quiet, thread, traverse }
+ocamlfind ocamlopt -c -thread -package threads -package str -o examples.cmx examples.ml # cached
+# Target: examples.native, tags: { dont_link_with, extension:native, file:examples.native, link, native, ocaml, package(str), package(threads), program, quiet, thread, traverse }
+ocamlfind ocamlopt -linkpkg -thread -package threads -package str future.cmx system.cmx mpi.cmx examples.cmx -o examples.native # cached
+# Compilation successful.
