@@ -211,7 +211,7 @@ module Seq (Par : Future.S) (Arg : SEQ_ARGS) : S = struct
     let rec scan_aux (parent) (cores, (lo, hi)): unit =
  
       (* Base case -- run sequential scan on one processor *)
-      if cores = 1 then
+      if cores <= 2 then
 
 	let sseq = Array.sub seq lo hi in
 	let res = Array.fold_left f base sseq in
@@ -226,8 +226,8 @@ module Seq (Par : Future.S) (Arg : SEQ_ARGS) : S = struct
 
 	(* Determine range and number of cores for left and right child *)
 	let mid = (lo + hi) / 2 in
-	let l_cores = cores / 2 in
-	let r_cores = cores - l_cores in
+	let l_cores = (cores - 1) / 2 in
+	let r_cores = (cores - 1) - l_cores in
 
 	(* Spawn left and right child *)
 	let l_child = Mpi.spawn scan_aux (l_cores, (lo, mid)) in
@@ -244,7 +244,6 @@ module Seq (Par : Future.S) (Arg : SEQ_ARGS) : S = struct
 	  | D1(x) -> x
 	  | D2(_) -> failwith "Communication error."
 	in
-
 
 	(* Apply f to left and right results, and send this to parent *)
 	Mpi.send parent (D1 (f l_result r_result));
@@ -269,7 +268,7 @@ module Seq (Par : Future.S) (Arg : SEQ_ARGS) : S = struct
 	in
 
 	(* Combine results to get an ordered array of scanned sub-arrays *)
-	Mpi.send parent (D2 (append l_scanned r_scanned));
+	Mpi.send parent (D2 (Array.append l_scanned r_scanned));
 
 	(* Wait for left and right processes to complete *)
 	Mpi.wait_die l_child;
@@ -277,7 +276,7 @@ module Seq (Par : Future.S) (Arg : SEQ_ARGS) : S = struct
     in
 
     (* Spawn process for root of tree *)
-    let root = Mpi.spawn scan_aux (1, (0, (length seq))) in
+    let root = Mpi.spawn scan_aux (3, (0, (length seq))) in
 
     (* Recieve result message from root -- this is ignored *)
     ignore (Mpi.receive root);
