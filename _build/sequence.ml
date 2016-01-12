@@ -205,21 +205,19 @@ module Seq (Par : Future.S) (Arg : SEQ_ARGS) : S = struct
 
     Array.of_list (seq_scan_aux (Array.to_list seq) base)
 
-		  
+
   let scan (f: 'a -> 'a -> 'a) (base: 'a) (seq: 'a t) : 'a t =
 
     let rec scan_aux (parent) (cores, (lo, hi)): unit =
-
+ 
       (* Base case -- run sequential scan on one processor *)
       if cores = 1 then
 
 	let sseq = Array.sub seq lo hi in
-
-	let sseq_first = Array.get sseq 0 in
-	let sseq_rest = Array.sub sseq 1 hi in
-	Mpi.send parent (D1 (Array.fold_left f sseq_first sseq_rest));
+	let res = Array.fold_left f base sseq in
+	Mpi.send parent (D1 res);
 	     
-	let from_left = Mpi.receive parent in
+	let from_left = Mpi.receive parent in	
 	let scanned = sequential_scan f from_left sseq in
 	Mpi.send parent (D2 (singleton scanned));
 
@@ -246,6 +244,7 @@ module Seq (Par : Future.S) (Arg : SEQ_ARGS) : S = struct
 	  | D1(x) -> x
 	  | D2(_) -> failwith "Communication error."
 	in
+
 
 	(* Apply f to left and right results, and send this to parent *)
 	Mpi.send parent (D1 (f l_result r_result));
@@ -278,14 +277,10 @@ module Seq (Par : Future.S) (Arg : SEQ_ARGS) : S = struct
     in
 
     (* Spawn process for root of tree *)
-    let root = Mpi.spawn scan_aux ((num_cores - 1), (0, length seq)) in
+    let root = Mpi.spawn scan_aux (1, (0, (length seq))) in
 
-    (* Receieve result message from root -- this is ignored *)
-    let _ =
-      match Mpi.receive root with
-      | D1(x) -> x
-      | D2(_) -> failwith "Communication error."
-    in
+    (* Recieve result message from root -- this is ignored *)
+    ignore (Mpi.receive root);
 
     (* Send base value as from_left message to root *)
     Mpi.send root base;
@@ -300,6 +295,6 @@ module Seq (Par : Future.S) (Arg : SEQ_ARGS) : S = struct
     (* Flatten this array to get full scanned array *)
     flatten subseqs
   ;;
-        
+
 end
 						     
